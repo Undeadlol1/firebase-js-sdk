@@ -73,6 +73,8 @@ var appId1 = 'appId1';
 var appId2 = 'appId2';
 var auth1 = null;
 var auth2 = null;
+var authInternal1 = null;
+var authInternal2 = null;
 var app1 = null;
 var app2 = null;
 var authUi1 = null;
@@ -1014,7 +1016,7 @@ function testGetUid_userSignedIn() {
     // Initialize App and Auth.
     app1 = firebase.initializeApp(config1, appId1);
     auth1 = app1.auth();
-    var authInternal1 = app1.container.getProvider('auth-internal').getImmediate();
+    authInternal1 = app1.container.getProvider('auth-internal').getImmediate();
     // Initially getUid() should return null;
     assertNull(auth1.getUid());
     assertNull(authInternal1.getUid());
@@ -1066,7 +1068,7 @@ function testGetUid_noUserSignedIn() {
   // Initialize App and Auth.
   app1 = firebase.initializeApp(config1, appId1);
   auth1 = app1.auth();
-  var authInternal1 = app1.container.getProvider('auth-internal').getImmediate();
+  authInternal1 = app1.container.getProvider('auth-internal').getImmediate();
   // Listen to Auth changes.
   var unsubscribe = auth1.onIdTokenChanged(function(currentUser) {
     // Unsubscribe of Auth state change listener.
@@ -1121,11 +1123,11 @@ function testNotifyAuthListeners() {
   currentUserStorageManager.setCurrentUser(user).then(function() {
     app1 = firebase.initializeApp(config1, appId1);
     auth1 = app1.auth();
-    var authInternal1 = app1.container.getProvider('auth-internal').getImmediate();
+    authInternal1 = app1.container.getProvider('auth-internal').getImmediate();
     authInternal1.addAuthTokenListener(app1AuthTokenListener);
     app2 = firebase.initializeApp(config2, appId2);
     auth2 = app2.auth();
-    var authInternal2 = app2.container.getProvider('auth-internal').getImmediate();
+    authInternal2 = app2.container.getProvider('auth-internal').getImmediate();
     authInternal2.addAuthTokenListener(app2AuthTokenListener);
     // Confirm all listeners reset.
     assertEquals(0, listener1.getCallCount());
@@ -1138,7 +1140,6 @@ function testNotifyAuthListeners() {
     auth2.addAuthTokenListener(listener3);
     // Wait for state to be ready on auth1.
     var unsubscribe = auth1.onIdTokenChanged(function(currentUser) {
-      console.log('auth1 llllllll', currentUser);
       unsubscribe();
       // Listener 1 and 2 triggered.
       assertEquals(1, listener1.getCallCount());
@@ -1190,7 +1191,6 @@ function testNotifyAuthListeners() {
     });
     // Wait for state to be ready on auth2.
     auth2.onIdTokenChanged(function(currentUser) {
-      console.log('auth222222', currentUser);
       // auth2 listener triggered on init with null state once.
       assertEquals(1, listener3.getCallCount());
       assertEquals(
@@ -10205,11 +10205,11 @@ function testAuth_proactiveTokenRefresh_firebaseServiceRemovedAfterSignIn() {
   auth1 = app1.auth();
   var subscriber = function(token) {};
   // Simulate Firebase service added.
-  var authInternal = app1.container.getProvider('auth-internal').getImmediate();
-  authInternal.addAuthTokenListener(subscriber);
+  authInternal1 = app1.container.getProvider('auth-internal').getImmediate();
+  authInternal1.addAuthTokenListener(subscriber);
   // Add same listener again to check that removing it once will ensure the
   // proactive refresh is stopped.
-  authInternal.addAuthTokenListener(subscriber);
+  authInternal1.addAuthTokenListener(subscriber);
   // Simulate user signed in.
   auth1.signInWithIdTokenResponse(expectedTokenResponse).then(function() {
     // Current user should be set to user1.
@@ -10221,7 +10221,7 @@ function testAuth_proactiveTokenRefresh_firebaseServiceRemovedAfterSignIn() {
     assertEquals(
         0, fireauth.AuthUser.prototype.stopProactiveRefresh.getCallCount());
     // Simulate Firebase service removed.
-    authInternal.removeAuthTokenListener(subscriber);
+    authInternal1.removeAuthTokenListener(subscriber);
     // Confirm proactive refresh stopped on that user.
     assertEquals(
         1, fireauth.AuthUser.prototype.stopProactiveRefresh.getCallCount());
