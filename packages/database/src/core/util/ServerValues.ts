@@ -23,7 +23,7 @@ import { nodeFromJSON } from '../snap/nodeFromJSON';
 import { PRIORITY_INDEX } from '../snap/indexes/PriorityIndex';
 import { Node } from '../snap/Node';
 import { ChildrenNode } from '../snap/ChildrenNode';
-import {SyncTree} from "../SyncTree";
+import { SyncTree } from '../SyncTree';
 
 /**
  * Generate placeholders for deferred values.
@@ -66,7 +66,11 @@ export const resolveDeferredValue = function(
   }
 };
 
-const resolveScalarDeferredValue = function(op: string, existing: Node, serverValues: { [k: string]: any }): string | number | boolean {
+const resolveScalarDeferredValue = function(
+  op: string,
+  existing: Node,
+  serverValues: { [k: string]: any }
+): string | number | boolean {
   switch (op) {
     case 'timestamp':
       return serverValues['timestamp'];
@@ -75,11 +79,15 @@ const resolveScalarDeferredValue = function(op: string, existing: Node, serverVa
   }
 };
 
-const resolveComplexDeferredValue = function(op: Object, existing: Node, unused: { [k: string]: any }): string | number | boolean {
+const resolveComplexDeferredValue = function(
+  op: Object,
+  existing: Node,
+  unused: { [k: string]: any }
+): string | number | boolean {
   if (op.hasOwnProperty('increment')) {
     const delta = op['increment'];
-    if (typeof(delta) !== 'number') {
-     assert(false, 'Unexpected increment value: ' + delta);
+    if (typeof delta !== 'number') {
+      assert(false, 'Unexpected increment value: ' + delta);
     }
 
     // Incrementing a non-number sets the value to the incremented amount
@@ -96,7 +104,7 @@ const resolveComplexDeferredValue = function(op: Object, existing: Node, unused:
     // No need to do over/underflow arithmetic here because JS only handles floats under the covers
     return existingVal + delta;
   } else {
-    assert(false, 'Unexpected server value: ' + JSON.stringify(op, null, 2))
+    assert(false, 'Unexpected server value: ' + JSON.stringify(op, null, 2));
   }
 };
 
@@ -116,7 +124,11 @@ export const resolveDeferredValueTree = function(
   tree.forEachTree(new Path(''), function(path, node) {
     resolvedTree.remember(
       path,
-      resolveDeferredValueSnapshot(node, existing.calcCompleteEventCache(path), serverValues),
+      resolveDeferredValueSnapshot(
+        node,
+        existing.calcCompleteEventCache(path),
+        serverValues
+      )
     );
   });
   return resolvedTree;
@@ -141,12 +153,20 @@ export const resolveDeferredValueSnapshot = function(
     | null
     | number
     | string;
-  const priority = resolveDeferredValue(rawPri, existing.getPriority(), serverValues);
+  const priority = resolveDeferredValue(
+    rawPri,
+    existing.getPriority(),
+    serverValues
+  );
   let newNode: Node;
 
   if (node.isLeafNode()) {
     const leafNode = node as LeafNode;
-    const value = resolveDeferredValue(leafNode.getValue(), existing, serverValues);
+    const value = resolveDeferredValue(
+      leafNode.getValue(),
+      existing,
+      serverValues
+    );
     if (
       value !== leafNode.getValue() ||
       priority !== leafNode.getPriority().val()

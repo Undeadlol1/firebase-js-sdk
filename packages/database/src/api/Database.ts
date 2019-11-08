@@ -42,10 +42,10 @@ export class Database implements FirebaseService {
     increment: (x: number) => {
       return {
         '.sv': {
-          'increment': x,
-        },
-      }
-    },
+          'increment': x
+        }
+      };
+    }
   };
 
   /**
