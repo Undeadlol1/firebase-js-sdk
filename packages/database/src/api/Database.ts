@@ -38,7 +38,14 @@ export class Database implements FirebaseService {
   static readonly ServerValue = {
     TIMESTAMP: {
       '.sv': 'timestamp'
-    }
+    },
+    increment: (x: number) => {
+      return {
+        '.sv': {
+          'increment': x,
+        },
+      }
+    },
   };
 
   /**

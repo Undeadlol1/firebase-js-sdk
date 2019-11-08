@@ -309,6 +309,7 @@ export class Repo {
     const newNodeUnresolved = nodeFromJSON(newVal, newPriority);
     const newNode = resolveDeferredValueSnapshot(
       newNodeUnresolved,
+      this.serverSyncTree_.calcCompleteEventCache(path),
       serverValues
     );
 
@@ -359,6 +360,7 @@ export class Repo {
       const newNodeUnresolved = nodeFromJSON(changedValue);
       changedChildren[changedKey] = resolveDeferredValueSnapshot(
         newNodeUnresolved,
+        this.serverSyncTree_.calcCompleteEventCache(path),
         serverValues
       );
     });
@@ -413,6 +415,7 @@ export class Repo {
     const serverValues = this.generateServerValues();
     const resolvedOnDisconnectTree = resolveDeferredValueTree(
       this.onDisconnect_,
+      this.serverSyncTree_,
       serverValues
     );
     let events: Event[] = [];
