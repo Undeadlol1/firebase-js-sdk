@@ -1,16 +1,15 @@
 import { expect } from 'chai';
-import {getRandomNode} from "./helpers/util";
-import {Database} from "../src/api/Database";
-import {Reference} from '../src/api/Reference';
-
+import { getRandomNode } from './helpers/util';
+import { Database } from '../src/api/Database';
+import { Reference } from '../src/api/Reference';
 
 describe('ServerValue tests', () => {
-  it ('resolves timestamps locally', async () => {
+  it('resolves timestamps locally', async () => {
     const node = getRandomNode() as Reference;
     const start = Date.now();
     const values: Array<number> = [];
     node.on('value', snap => {
-      expect(typeof snap.val()).to.equal("number");
+      expect(typeof snap.val()).to.equal('number');
       values.push(snap.val() as number);
     });
     await node.set(Database.ServerValue.TIMESTAMP);
@@ -22,7 +21,7 @@ describe('ServerValue tests', () => {
     values.forEach(serverTime => {
       const delta = Math.abs(serverTime - start);
       expect(delta).to.be.lessThan(1000);
-    })
+    });
   });
 
   it('handles increments locally', async () => {
@@ -38,9 +37,9 @@ describe('ServerValue tests', () => {
     try {
       const values: Array<number> = [];
       node.on('value', snap => {
-        console.log("new value", snap.val());
-        expect(typeof snap.val()).to.equal("number");
-        values.push(snap.val() as number)
+        console.log('new value', snap.val());
+        expect(typeof snap.val()).to.equal('number');
+        values.push(snap.val() as number);
       });
 
       // Because we're offline, we shouldn't await the node operations. This would block the test.
@@ -49,9 +48,9 @@ describe('ServerValue tests', () => {
       node.set(addOne);
 
       node.off('value');
-      expect(values).to.deep.equal([1, 5, 6])
+      expect(values).to.deep.equal([1, 5, 6]);
     } finally {
-      node.database.goOnline()
+      node.database.goOnline();
     }
   });
 });
