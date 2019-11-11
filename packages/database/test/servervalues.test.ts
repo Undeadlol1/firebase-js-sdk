@@ -54,7 +54,6 @@ describe('ServerValue tests', () => {
     try {
       const values: Array<number> = [];
       node.on('value', snap => {
-        console.log('new value', snap.val());
         expect(typeof snap.val()).to.equal('number');
         values.push(snap.val() as number);
       });
